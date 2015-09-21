@@ -1,0 +1,29 @@
+<html>
+<head>
+<script language="javascript" src="jquery-1.7.2.min.js"></script>
+<script language="javascript" src="jquery.jqprint-0.3.js"></script>
+<script language="javascript">
+function  a(){
+//$("#ddd").jqprint();
+
+
+    var parentDiv=$('<div></div>');        //创建一个父DIV
+    parentDiv.attr('id','parent');        //给父DIV设置ID
+    parentDiv.addClass('parentDiv');    //添加CSS样式
+
+    var childDiv=$('<div></div>');        //创建一个子DIV
+    childDiv.attr('id','child');            //给子DIV设置ID
+    childDiv.addClass('childDiv');    //添加CSS样式
+    childDiv.appendTo(parentDiv);        //将子DIV添加到父DIV中
+	childDiv.append("test");
+	parentDiv.jqprint();
+//    parentDiv.appendTo('body');            //将父DIV添加到BODY中
+}
+</script>
+</head>
+<body>
+
+
+<input type="button" onclick=" a()" value="print"/>
+</body>
+</html>
