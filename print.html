@@ -1,12 +1,37 @@
 <html>
 <head>
 <script language="javascript" src="jquery-1.7.2.min.js"></script>
+<script language="javascript" src="jquery.tmpl.js"></script>
 <script language="javascript" src="jquery.jqprint-0.3.js"></script>
+<script language="javascript" src="qrcode.js"></script>
+<script type="text/javascript" src="jquery.qrcode-0.12.0.js"></script>
+<link rel="stylesheet" type="text/css" href="print.css"/>
+
+<script id="printerTemplate" type="text/x-jquery-tmpl">
+<div id="ticket">
+<div id="delivery_id" class="ticket_content">配送单号:${delivery_id}</div>
+<div id="order_id" class="ticket_content">订单号:${order_id}</div>
+<div id="goods_name" class="ticket_content">货物:${goods_name}</div>
+<div><span id="need_pay" class="ticket_content">代收款:${need_pay}</span><span id="price">价格:${price}</span></div>
+<hr id="spliter"/>
+<div><span id="name" class="ticket_content">姓名:${customer_name} </span><span id="phone_number">${customer_phone_number}</span></div>
+<div id="address" class="ticket_content">地址:${customer_address}</div>
+<div id="extra" class="ticket_content">备注:${extra}</div>
+<div><span id="qrcode" class="ticket_content">{{html qrcode}}</span><span id="signature">客户签字:</span></div>
+<div id="retailer_name" class="ticket_content">商家名称:${retailer_name}</div>
+<div id="retailer_phone_number" class="ticket_content">商家电话:${retailer_phone_number}</div>
+<div id="nearest_retailer" class="ticket_content">最近分店:${nearest_retailer}</div>
+</div>
+<p style="page-break-after:always"></p>
+</script>
+
 <script language="javascript">
+var parentDiv=$('<div></div>'); 
+
 function  a(){
 //$("#ddd").jqprint();
 
-
+/*
     var parentDiv=$('<div></div>');        //创建一个父DIV
     parentDiv.attr('id','parent');        //给父DIV设置ID
     parentDiv.addClass('parentDiv');    //添加CSS样式
@@ -15,15 +40,64 @@ function  a(){
     childDiv.attr('id','child');            //给子DIV设置ID
     childDiv.addClass('childDiv');    //添加CSS样式
     childDiv.appendTo(parentDiv);        //将子DIV添加到父DIV中
-	childDiv.append("test");
-	parentDiv.jqprint();
+	childDiv.append("testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest");
+	parentDiv.jqprint({"debug": true});
 //    parentDiv.appendTo('body');            //将父DIV添加到BODY中
+*/
+	var data = new Array();
+	for (var i = 0; i < 19; i++) {
+		
+		var code = $('<div></div>').qrcode({
+			render: "image", //table canvas
+			ecLevel:"M",
+			size : 72,
+			text: "123123123"
+		});
+		
+		data.push(
+            {
+                delivery_id: "123456789987654321",
+                order_id: "123789654",
+                goods_name: "goods name",
+                need_pay: "Y",
+				price:"100",
+				customer_name:"Mr Wang",
+				customer_phone_number:"13800138000",
+				customer_address:"XXX XXX XXXX XXXXX",
+				extra:"XXXXXXXXXXXXX",
+				retailer_name:"XXX",
+				retailer_phone_number:"13800000000",
+				nearest_retailer:"XXXXXX",
+				qrcode:code.html()
+            });
+	}
+
+            // alert($("#studentsTemplate").tmpl(data).htm());
+            var parentDiv = $("#printerTemplate").tmpl(data);
+//			var qrcode = new QRCode(parentDiv.getElementById("qrcode"), {
+//				width : 96,
+//				height : 96
+//			});
+//			qrcode.makeCode("test");
+			parentDiv.jqprint({"debug": true});
+
+//	$("#printerTemplate").tmpl(data).appendTo("#rows");
+
+//    var qrcode = new QRCode(parentDiv.getElementById("qrcode"), {
+//        width : 96,
+//        height : 96
+//    });
+//    qrcode.makeCode("test");
+//	parentDiv.jqprint({"debug": true});
 }
 </script>
 </head>
 <body>
-
-
+ <table cellspacing="0" cellpadding="3" border="1"> 
+            <tbody id="rows"> 
+            </tbody> 
+        </table> 
 <input type="button" onclick=" a()" value="print"/>
 </body>
+<OBJECT id=wb height=0 width=0 classid=CLSID:8856F961-340A-11D0-A96B-00C04FD705A2></OBJECT>
 </html>
