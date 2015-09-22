@@ -1,129 +1,135 @@
 <html>
-<head>
-<meta http-equiv=“X-UA-Compatible” content=“IE=6″>
+ <head> 
+	<meta http-equiv="“X-UA-Compatible”" content="“IE=6″" /> 
+	<script language="javascript" src="jquery-1.7.2.min.js"></script> 
+	<script language="javascript" src="jquery.tmpl.js"></script> 
+	<script language="javascript" src="jquery.jqprint-0.3.js"></script> 
+	<script type="text/javascript" src="jquery.qrcode-0.12.0.js"></script> 
+	<link rel="stylesheet" type="text/css" href="print.css" /> 
+	<script id="printerTemplate" type="text/x-jquery-tmpl">
+		<div id="ticket">
+		<div id="delivery_id" class="ticket_content">配送单号:${delivery_id}</div>
+		<div id="order_id" class="ticket_content">订单号:${order_id}</div>
+		<div id="goods_name" class="ticket_content">货物:${goods_name}</div>
+		<div><span id="need_pay" class="ticket_content">代收款:${need_pay}</span><span id="price">价格:${price}</span></div>
+		<hr id="spliter"/>
+		<div><span id="name" class="ticket_content">姓名:${customer_name} </span><span id="phone_number">${customer_phone_number}</span></div>
+		<div id="address" class="ticket_content">地址:${customer_address}</div>
+		<div id="extra" class="ticket_content">备注:${extra}</div>
+		<div><span id="qrcode" class="ticket_content">{{html qrcode}}</span><span id="signature">客户签字:</span></div>
+		<div id="retailer_name" class="ticket_content">商家名称:${retailer_name}</div>
+		<div id="retailer_phone_number" class="ticket_content">商家电话:${retailer_phone_number}</div>
+		<div id="nearest_retailer" class="ticket_content">最近分店:${nearest_retailer}</div>
+		</div>
+		<p style="page-break-after:always"></p>
+	</script> 
+	<script language="javascript">
+		var ticketPrinter = {
 
-<script language="javascript" src="jquery-1.7.2.min.js"></script>
-<script language="javascript" src="jquery.tmpl.js"></script>
-<script language="javascript" src="jquery.jqprint-0.3.js"></script>
-<script type="text/javascript" src="jquery.qrcode-0.12.0.js"></script>
-<link rel="stylesheet" type="text/css" href="print.css"/>
+			　　 // 当前状态
+			　　currentState: 'waiting',
 
-<script id="printerTemplate" type="text/x-jquery-tmpl">
-<div id="ticket">
-<div id="delivery_id" class="ticket_content">配送单号:${delivery_id}</div>
-<div id="order_id" class="ticket_content">订单号:${order_id}</div>
-<div id="goods_name" class="ticket_content">货物:${goods_name}</div>
-<div><span id="need_pay" class="ticket_content">代收款:${need_pay}</span><span id="price">价格:${price}</span></div>
-<hr id="spliter"/>
-<div><span id="name" class="ticket_content">姓名:${customer_name} </span><span id="phone_number">${customer_phone_number}</span></div>
-<div id="address" class="ticket_content">地址:${customer_address}</div>
-<div id="extra" class="ticket_content">备注:${extra}</div>
-<div><span id="qrcode" class="ticket_content">{{html qrcode}}</span><span id="signature">客户签字:</span></div>
-<div id="retailer_name" class="ticket_content">商家名称:${retailer_name}</div>
-<div id="retailer_phone_number" class="ticket_content">商家电话:${retailer_phone_number}</div>
-<div id="nearest_retailer" class="ticket_content">最近分店:${nearest_retailer}</div>
-</div>
-<p style="page-break-after:always"></p>
-</script>
+			　　 // 绑定事件
+			　　initialize: function() {　　　　
+				var self = this;
+				var conter = 0;　　　　self.on("start", self.transition);　　
+			},
 
-<script language="javascript">
+			　　 // 状态转换
+			　　transition: function(event) {　　　　
+				switch (this.currentState) {　　　　　　
+				case "start":
+					　　　　　　　　this.currentState = 'downloading';
+					getInfo();　　　　　　　　
+					break;　　　　　　
+				case "infoReceived":
+					　　　　　　　　this.currentState = 'Check';
+					checkInfo();　　　　　　　　
+					break;　　　　　　
+				case "allReceived":
+					　　　　　　　　this.currentState = 'waiting';
+					print();　　　　　　　　
+					break;　　　　　　
+				default:
+					　　　　　　　　console.log('Invalid State!');　　　　　　　　
+					break;　　　　
+				}　　
+			}
 
-var ticketPrinter = {
-    
-　　// 当前状态
-　　currentState: 'waiting',
+		};
 
-　　// 绑定事件
-　　initialize: function() {
-　　　　var self = this;
-		var conter = 0;
-　　　　self.on("start", self.transition);
-　　},
+		function a() {
+			$('input[name="order"]').attr("checked", this.checked);
 
-　　// 状态转换
-　　transition: function(event){
-　　　　switch(this.currentState) {
-　　　　　　case "start":
-　　　　　　　　this.currentState = 'downloading';
-				getInfo();
-　　　　　　　　break;
-　　　　　　case "infoReceived":
-　　　　　　　　this.currentState = 'Check';
-				checkInfo();
-　　　　　　　　break;
-　　　　　　case "allReceived":
-　　　　　　　　this.currentState = 'waiting';
-				print();
-　　　　　　　　break;
-　　　　　　default:
-　　　　　　　　console.log('Invalid State!');
-　　　　　　　　break;
-　　　　}
-　　}
+			$('input:checkbox').each(function() {
+				if ($(this).attr('checked') == "checked") {
+					alert($(this).val());
+				}
+			});
 
-};
+			/*
+		$.ajax(  
+			{  
+				type:'post',  
+				url : 'http://www.guanshuwei.com/print.php', 
+				dataType : 'jsonp',  
+				jsonp:"callback",  
+				data:{poiId:"1",id:"6224"},
+				success  : function(data) {  
+					alert(data);  
+				},  
+				error : function() {  
+					alert('fail');  
+				}  
+			}  
+		); 
+		*/
+			//function check_status(){
+			//}
+			/*
+			var data = new Array();
+			for (var i = 0; i < 19; i++) {
+				
+				var code = $('<div></div>').qrcode({
+					render: "image", //table canvas
+					ecLevel:"M",
+					size : 72,
+					text: "123123123"
+				});
+				
+				data.push(
+					{
+						delivery_id: "123456789987654321",
+						order_id: "123789654",
+						goods_name: "goods name",
+						need_pay: "Y",
+						price:"100",
+						customer_name:"Mr Wang",
+						customer_phone_number:"13800138000",
+						customer_address:"XXX XXX XXXX XXXXX",
+						extra:"XXXXXXXXXXXXX",
+						retailer_name:"XXX",
+						retailer_phone_number:"13800000000",
+						nearest_retailer:"XXXXXX",
+						qrcode:code.html()
+					});
+			}
 
-function  a(){
-
-$.ajax(  
-    {  
-        type:'post',  
-        url : 'http://www.guanshuwei.com/print.php', 
-        dataType : 'jsonp',  
-        jsonp:"callback",  
-		data:{poiId:"1",id:"6224"},
-        success  : function(data) {  
-            alert(data);  
-        },  
-        error : function() {  
-            alert('fail');  
-        }  
-    }  
-); 
-
-//function check_status(){
-
-//}
-
-	var data = new Array();
-	for (var i = 0; i < 19; i++) {
-		
-		var code = $('<div></div>').qrcode({
-			render: "image", //table canvas
-			ecLevel:"M",
-			size : 72,
-			text: "123123123"
-		});
-		
-		data.push(
-            {
-                delivery_id: "123456789987654321",
-                order_id: "123789654",
-                goods_name: "goods name",
-                need_pay: "Y",
-				price:"100",
-				customer_name:"Mr Wang",
-				customer_phone_number:"13800138000",
-				customer_address:"XXX XXX XXXX XXXXX",
-				extra:"XXXXXXXXXXXXX",
-				retailer_name:"XXX",
-				retailer_phone_number:"13800000000",
-				nearest_retailer:"XXXXXX",
-				qrcode:code.html()
-            });
-	}
-
-            var parentDiv = $("#printerTemplate").tmpl(data);
-			parentDiv.jqprint({"debug": false});
-
-}
-</script>
-</head>
-<body>
- <table cellspacing="0" cellpadding="3" border="1"> 
-            <tbody id="rows"> 
-            </tbody> 
-        </table> 
-<input type="button" onclick="a()" value="print"/>
-</body>
+					var parentDiv = $("#printerTemplate").tmpl(data);
+					parentDiv.jqprint({"debug": false});
+		*/
+		}
+	</script> 
+ </head> 
+ <body> 
+  <input type="button" onclick="a()" value="print" /> 
+  <input type="checkbox" name="order" value="checkbox1" /> checkbox1 
+  <input type="checkbox" name="order" value="checkbox2" /> checkbox2 
+  <input type="checkbox" name="order" value="checkbox3" /> checkbox3 
+  <input type="checkbox" name="order" value="checkbox4" /> checkbox4 
+  <input type="checkbox" name="order" value="checkbox5" /> checkbox5 
+  <input type="checkbox" name="order" value="checkbox6" /> checkbox6 
+  <input type="checkbox" name="order" value="checkbox7" /> checkbox7 
+  <input type="checkbox" name="order" value="checkbox8" />   
+ </body>
 </html>
