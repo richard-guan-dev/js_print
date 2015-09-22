@@ -1,38 +1,22 @@
 @page {
-     size: 80mm 100mm; /* or size: 794px 1123px;   */
-	 margin: 5mm 5mm 5mm 5mm;
+	size:80mm 100mm;
+	margin:5mm 5mm 5mm 5mm;
 }
-
-#ticket{
-	font-size : 8pt;
+#ticket {
+	font-size:8pt;
 }
-
-.ticket_content{
-	margin :  2mm 0mm 2mm 0mm;
+.ticket_content {
+	margin:2mm 0mm 2mm 0mm;
 }
-
-#delivery_id{
-	font-size : 150%;
+#delivery_id {
+	font-size:150%;
 }
-
-#spliter{
-	border : 1px dashed black;
+#spliter {
+	border:1px dashed black;
 }
-
-#price{
+#price {
 	padding-left:10mm;
 }
-
-#signature{
+#signature {
 	padding-left:10mm;
 }
-
-#qrcode{
-    /*text-align: center;*/
-    /*display: table-cell;*/
-    /*width: 96px;*/
-    /*height: 96px;*/
-    /*vertical-align:middle;*/
-    /*position: relative;*/
-}
-    

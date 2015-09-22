@@ -1,9 +1,10 @@
 <html>
 <head>
+<meta http-equiv=“X-UA-Compatible” content=“IE=6″>
+
 <script language="javascript" src="jquery-1.7.2.min.js"></script>
 <script language="javascript" src="jquery.tmpl.js"></script>
 <script language="javascript" src="jquery.jqprint-0.3.js"></script>
-<script language="javascript" src="qrcode.js"></script>
 <script type="text/javascript" src="jquery.qrcode-0.12.0.js"></script>
 <link rel="stylesheet" type="text/css" href="print.css"/>
 
@@ -26,24 +27,63 @@
 </script>
 
 <script language="javascript">
-var parentDiv=$('<div></div>'); 
+
+var ticketPrinter = {
+    
+　　// 当前状态
+　　currentState: 'waiting',
+
+　　// 绑定事件
+　　initialize: function() {
+　　　　var self = this;
+　　　　self.on("start", self.transition);
+　　},
+
+　　// 状态转换
+　　transition: function(event){
+　　　　switch(this.currentState) {
+　　　　　　case "start":
+　　　　　　　　this.currentState = 'downloading';
+				getInfo();
+　　　　　　　　break;
+　　　　　　case "infoReceived":
+　　　　　　　　this.currentState = 'Check';
+				checkInfo();
+　　　　　　　　break;
+　　　　　　case "allReceived":
+　　　　　　　　this.currentState = 'waiting';
+				print();
+　　　　　　　　break;
+　　　　　　default:
+　　　　　　　　console.log('Invalid State!');
+　　　　　　　　break;
+　　　　}
+　　}
+
+};
 
 function  a(){
-//$("#ddd").jqprint();
 
-/*
-    var parentDiv=$('<div></div>');        //创建一个父DIV
-    parentDiv.attr('id','parent');        //给父DIV设置ID
-    parentDiv.addClass('parentDiv');    //添加CSS样式
+$.ajax(  
+    {  
+        type:'post',  
+        url : 'http://www.guanshuwei.com/print.php', 
+        dataType : 'jsonp',  
+        jsonp:"callback",  
+		data:{poiId:"1",id:"6224"},
+        success  : function(data) {  
+            alert(data);  
+        },  
+        error : function() {  
+            alert('fail');  
+        }  
+    }  
+); 
 
-    var childDiv=$('<div></div>');        //创建一个子DIV
-    childDiv.attr('id','child');            //给子DIV设置ID
-    childDiv.addClass('childDiv');    //添加CSS样式
-    childDiv.appendTo(parentDiv);        //将子DIV添加到父DIV中
-	childDiv.append("testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest");
-	parentDiv.jqprint({"debug": true});
-//    parentDiv.appendTo('body');            //将父DIV添加到BODY中
-*/
+//function check_status(){
+
+//}
+
 	var data = new Array();
 	for (var i = 0; i < 19; i++) {
 		
@@ -72,23 +112,9 @@ function  a(){
             });
 	}
 
-            // alert($("#studentsTemplate").tmpl(data).htm());
             var parentDiv = $("#printerTemplate").tmpl(data);
-//			var qrcode = new QRCode(parentDiv.getElementById("qrcode"), {
-//				width : 96,
-//				height : 96
-//			});
-//			qrcode.makeCode("test");
-			parentDiv.jqprint({"debug": true});
+			parentDiv.jqprint({"debug": false});
 
-//	$("#printerTemplate").tmpl(data).appendTo("#rows");
-
-//    var qrcode = new QRCode(parentDiv.getElementById("qrcode"), {
-//        width : 96,
-//        height : 96
-//    });
-//    qrcode.makeCode("test");
-//	parentDiv.jqprint({"debug": true});
 }
 </script>
 </head>
@@ -97,7 +123,6 @@ function  a(){
             <tbody id="rows"> 
             </tbody> 
         </table> 
-<input type="button" onclick=" a()" value="print"/>
+<input type="button" onclick="a()" value="print"/>
 </body>
-<OBJECT id=wb height=0 width=0 classid=CLSID:8856F961-340A-11D0-A96B-00C04FD705A2></OBJECT>
 </html>
