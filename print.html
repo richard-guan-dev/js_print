@@ -1,10 +1,10 @@
 <html>
  <head> 
-	<meta http-equiv="＾X-UA-Compatible￣" content="＾IE=6≦" /> 
 	<script language="javascript" src="jquery-1.7.2.min.js"></script> 
 	<script language="javascript" src="jquery.tmpl.js"></script> 
 	<script language="javascript" src="jquery.jqprint-0.3.js"></script> 
 	<script type="text/javascript" src="jquery.qrcode-0.12.0.js"></script> 
+	<script type="text/javascript" src="jquery.cookie.js"></script>
 	<link rel="stylesheet" type="text/css" href="print.css" /> 
 	<script id="printerTemplate" type="text/x-jquery-tmpl">
 		<div id="ticket">
@@ -21,115 +21,132 @@
 		<div id="retailer_phone_number" class="ticket_content">斌社窮三:${retailer_phone_number}</div>
 		<div id="nearest_retailer" class="ticket_content">恷除蛍糾:${nearest_retailer}</div>
 		</div>
-		<p style="page-break-after:always"></p>
+		{{if !isLast}}<p style="page-break-after:always">{{/if}}
 	</script> 
 	<script language="javascript">
-		var ticketPrinter = {
-
-			　　 // 輝念彜蓑
-			　　currentState: 'waiting',
-
-			　　 // 鰯協並周
-			　　initialize: function() {　　　　
-				var self = this;
-				var conter = 0;　　　　self.on("start", self.transition);　　
-			},
-
-			　　 // 彜蓑廬算
-			　　transition: function(event) {　　　　
-				switch (this.currentState) {　　　　　　
-				case "start":
-					　　　　　　　　this.currentState = 'downloading';
-					getInfo();　　　　　　　　
-					break;　　　　　　
-				case "infoReceived":
-					　　　　　　　　this.currentState = 'Check';
-					checkInfo();　　　　　　　　
-					break;　　　　　　
-				case "allReceived":
-					　　　　　　　　this.currentState = 'waiting';
-					print();　　　　　　　　
-					break;　　　　　　
-				default:
-					　　　　　　　　console.log('Invalid State!');　　　　　　　　
-					break;　　　　
-				}　　
-			}
-
-		};
-
-		function a() {
-			$('input[name="order"]').attr("checked", this.checked);
-
-			$('input:checkbox').each(function() {
-				if ($(this).attr('checked') == "checked") {
-					alert($(this).val());
-				}
-			});
-
-			/*
+	$(function(){
 		$.ajax(  
 			{  
 				type:'post',  
-				url : 'http://www.guanshuwei.com/print.php', 
+				url : 'http://www.guanshuwei.com/print11.php',
+				//url : 'http://www.baidu.com',				
 				dataType : 'jsonp',  
 				jsonp:"callback",  
 				data:{poiId:"1",id:"6224"},
-				success  : function(data) {  
-					alert(data);  
+				complete : function(XHR, TS){
+									alert("test!");
+				}, 
+				success  : function(responseData) {  
+					alert("test");
+					//alert(responseData.data.id);
 				},  
-				error : function() {  
-					alert('fail');  
-				}  
-			}  
-		); 
-		*/
-			//function check_status(){
-			//}
-			/*
+				error : function(XMLHttpRequest, textStatus, errorThrown) {  
+					alert(textStatus);				
+				}
+			}); 
+		});
+	
+		var orderData;
+		var totalTicket;
+		
+		function checkStatus(){
+			
+		}
+		
+		function processData(data){
+			orderData.push(data);
+			totalTicket++;
+		}
+		
+		function processBadData(){
+			totalTicket++;
+		}
+		
+		function printTicket(){
+					
 			var data = new Array();
-			for (var i = 0; i < 19; i++) {
+			for (var i = 0; i < orderData.size(); i++) {
 				
 				var code = $('<div></div>').qrcode({
-					render: "image", //table canvas
+					render: "image",
 					ecLevel:"M",
-					size : 72,
-					text: "123123123"
+					size : 100,
+					text: orderData[i].id + "_" + orderData[i].order_id
 				});
+				
+				var isLast = false;
+				
+				if(i == orderData.size() - 1){
+					isLast = true;
+				}
 				
 				data.push(
 					{
-						delivery_id: "123456789987654321",
-						order_id: "123789654",
-						goods_name: "goods name",
-						need_pay: "Y",
-						price:"100",
-						customer_name:"Mr Wang",
-						customer_phone_number:"13800138000",
-						customer_address:"XXX XXX XXXX XXXXX",
-						extra:"XXXXXXXXXXXXX",
-						retailer_name:"XXX",
-						retailer_phone_number:"13800000000",
-						nearest_retailer:"XXXXXX",
-						qrcode:code.html()
+						delivery_id: orderData[i].delivery_id,
+						order_id: orderData[i].order_id,
+						goods_name: orderData[i].goods_name,
+						need_pay: orderData[i].order_id,
+						price:orderData[i].order_id,
+						customer_name:orderData[i].order_id,
+						customer_phone_number:orderData[i].order_id,
+						customer_address:orderData[i].order_id,
+						extra:orderData[i].order_id,
+						retailer_name:orderData[i].order_id,
+						retailer_phone_number:orderData[i].order_id,
+						nearest_retailer:orderData[i].order_id,
+						qrcode:code.html(),
+						isLast: isLast
 					});
 			}
 
-					var parentDiv = $("#printerTemplate").tmpl(data);
-					parentDiv.jqprint({"debug": false});
-		*/
+			var parentDiv = $("#printerTemplate").tmpl(data);
+			parentDiv.jqprint({"debug": false});
+		}
+			
+		function startPrint() {
+			$('input[name="order"]').attr("checked", this.checked);
+			
+			var idArray = new Array();
+			$('input:checkbox').each(function() {
+				if ($(this).attr('checked') == "checked") {
+					idArray.push($(this).val());
+				}
+			});
+
+			orderData = new Array();
+			var poiId = $.cookie('poiId');
+			for(var i = 0; i < idArray.size(); i++){
+			//TODO	//var requestUrl = 'http://www.guanshuwei.com/print.php?poiId=' + poiId + "&id=" + idArray[i]; 
+			var requestData = '{"poiId":' + poiId + ',"id":' + idArray[i] + '}';
+				$.ajax(  
+					{  
+						type:'post',  
+						url : 'http://www.guanshuwei.com/print.php', 
+						dataType : 'jsonp',  
+						jsonp:"callback",  
+						data:requestData,
+						success  : function(data) {  
+							processData(data);
+							checkStatus();
+						},  
+						error : function() {  
+							processBadData();
+							checkStatus();					
+						}  
+					}); 
+			}	
 		}
 	</script> 
  </head> 
  <body> 
-  <input type="button" onclick="a()" value="print" /> 
-  <input type="checkbox" name="order" value="checkbox1" /> checkbox1 
-  <input type="checkbox" name="order" value="checkbox2" /> checkbox2 
-  <input type="checkbox" name="order" value="checkbox3" /> checkbox3 
-  <input type="checkbox" name="order" value="checkbox4" /> checkbox4 
-  <input type="checkbox" name="order" value="checkbox5" /> checkbox5 
-  <input type="checkbox" name="order" value="checkbox6" /> checkbox6 
-  <input type="checkbox" name="order" value="checkbox7" /> checkbox7 
-  <input type="checkbox" name="order" value="checkbox8" />   
+  <input type="button" onclick="startPrint()" value="print" /> 
+  <input type="checkbox" name="order" value="1" /> checkbox1 
+  <input type="checkbox" name="order" value="2" /> checkbox2 
+  <input type="checkbox" name="order" value="3" /> checkbox3 
+  <input type="checkbox" name="order" value="4" /> checkbox4 
+  <input type="checkbox" name="order" value="5" /> checkbox5 
+  <input type="checkbox" name="order" value="6" /> checkbox6 
+  <input type="checkbox" name="order" value="7" /> checkbox7 
+  <input type="checkbox" name="order" value="8" /> checkbox8
  </body>
 </html>

@@ -1,5 +1,5 @@
 @page {
-	size:80mm 100mm;
+	size:90mm 110mm;
 	margin:5mm 5mm 5mm 5mm;
 }
 #ticket {
@@ -18,5 +18,5 @@
 	padding-left:10mm;
 }
 #signature {
-	padding-left:10mm;
+	padding-left:5mm;
 }
