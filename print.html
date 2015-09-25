@@ -23,24 +23,31 @@
 		</div>
 		{{if !isLast}}<p style="page-break-after:always">{{/if}}
 	</script> 
-	<script language="javascript">
+	<script language="javascript">  
+    
 	$(function(){
+	
+		var postData = new Array();
+		postData["poiId"] = 1;
+		postData["id"] = new Array();
+		postData["id"].push(6543);
+		postData["id"].push(6543);
+		postData["id"].push(6543);
+
 		$.ajax(  
 			{  
-				type:'post',  
-				url : 'http://www.guanshuwei.com/print11.php',
+				type:'POST',  
+				url : 'http://www.guanshuwei.com/print.php',
 				//url : 'http://www.baidu.com',				
-				dataType : 'jsonp',  
-				jsonp:"callback",  
-				data:{poiId:"1",id:"6224"},
-				complete : function(XHR, TS){
-									alert("test!");
-				}, 
+				traditional: true,
+				//dataType:"json",
+				data: postData + "",
 				success  : function(responseData) {  
-					alert("test");
+					alert("succ");
 					//alert(responseData.data.id);
 				},  
 				error : function(XMLHttpRequest, textStatus, errorThrown) {  
+													alert("test error");
 					alert(textStatus);				
 				}
 			}); 
@@ -48,6 +55,7 @@
 	
 		var orderData;
 		var totalTicket;
+		var currentTicket;
 		
 		function checkStatus(){
 			
@@ -62,10 +70,19 @@
 			totalTicket++;
 		}
 		
+		function printTodayTicket(){
+			//var resp = post("http://www.geeklogistics.cn/api/v1/order/list", {poiId :1,status:100,pageSize:1000,currentPage:1});
+			//alert(resp);
+			
+			$.post('http://www.geeklogistics.cn/api/v1/order/list?poiId=6&status=100&pageSize=100&currentPage=1&jsoncallback=?',function(data){ 
+				alert(data); 
+			}) 
+		}
+		
 		function printTicket(){
 					
 			var data = new Array();
-			for (var i = 0; i < orderData.size(); i++) {
+			for (var i = 0; i < orderData.length; i++) {
 				
 				var code = $('<div></div>').qrcode({
 					render: "image",
@@ -76,7 +93,7 @@
 				
 				var isLast = false;
 				
-				if(i == orderData.size() - 1){
+				if(i == orderData.length - 1){
 					isLast = true;
 				}
 				
@@ -113,11 +130,12 @@
 				}
 			});
 
+			totalTicket = idArray.length;
 			orderData = new Array();
 			var poiId = $.cookie('poiId');
-			for(var i = 0; i < idArray.size(); i++){
+			for(var i = 0; i < idArray.length; i++){
 			//TODO	//var requestUrl = 'http://www.guanshuwei.com/print.php?poiId=' + poiId + "&id=" + idArray[i]; 
-			var requestData = '{"poiId":' + poiId + ',"id":' + idArray[i] + '}';
+				var requestData = '{"poiId":' + poiId + ',"id":' + idArray[i] + '}';
 				$.ajax(  
 					{  
 						type:'post',  
@@ -148,5 +166,12 @@
   <input type="checkbox" name="order" value="6" /> checkbox6 
   <input type="checkbox" name="order" value="7" /> checkbox7 
   <input type="checkbox" name="order" value="8" /> checkbox8
+  
+  <form id="form1" name="form1" method="post" action="?action=update">
+  <input name="c" type="checkbox" id="c" value="1" />   1
+  <input name="c" type="checkbox" id="c" value="2" />   2
+  <input name="c" type="checkbox" id="c" value="3" />   3
+  <input type="submit" name="Submit" value="Ìá½»" />
+</form>
  </body>
 </html>
